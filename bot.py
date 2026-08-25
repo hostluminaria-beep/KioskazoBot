@@ -15,7 +15,7 @@ async def start(update, context):
         [InlineKeyboardButton("Ayuda", callback_data="ayuda")],
     ]
     await update.message.reply_text(
-        "BOT DE OFERTAS DE VENTA\n\nPublica, busca y contacta.\nAdministracion: Luminaria",
+        "KIOSKAZO\n\nPublica, busca y contacta ofertas de venta.",
         reply_markup=InlineKeyboardMarkup(teclado)
     )
 
@@ -61,7 +61,7 @@ async def handle_mensaje(update, context):
             estados.pop(uid, None)
             await update.message.reply_text(f"Bienvenido {nombre}")
         else:
-            await update.message.reply_text("No se pudo iniciar sesion. Verifica nombre, contrasena o dispositivo.")
+            await update.message.reply_text("No se pudo iniciar sesion.")
     elif est == "registro_nombre":
         if db.get_usuario_by_nombre(texto):
             await update.message.reply_text("Ese nombre ya existe.")
@@ -73,9 +73,12 @@ async def handle_mensaje(update, context):
         nombre = estados[uid]["nombre"]
         db.registrar_usuario(uid, nombre, texto)
         u = db.get_usuario(uid)
-        sesiones[uid] = u["id"]
-        estados.pop(uid, None)
-        await update.message.reply_text(f"Registrado como {nombre}")
+        if u:
+            sesiones[uid] = u["id"]
+            estados.pop(uid, None)
+            await update.message.reply_text(f"Registrado como {nombre}")
+        else:
+            await update.message.reply_text("Error al registrar. Intenta de nuevo.")
     elif est == "publicar_categoria":
         estados[uid]["categoria"] = texto
         estados[uid]["estado"] = "publicar_producto"
@@ -122,7 +125,7 @@ async def publicar(update, context):
     if uid not in sesiones:
         await update.message.reply_text("Inicia sesion primero.")
         return
-    categorias = db.client.execute("SELECT nombre FROM categorias").rows
+    categorias = db.execute("SELECT nombre FROM categorias").get("rows", [])
     teclado = [[InlineKeyboardButton(c[0], callback_data=f"cat_{c[0]}")] for c in categorias]
     await update.message.reply_text("Elige categoria:", reply_markup=InlineKeyboardMarkup(teclado))
 
