@@ -70,15 +70,14 @@ async def handle_mensaje(update, context):
             estados[uid]["estado"] = "registro_pass"
             await update.message.reply_text("Elige una contrasena:")
     elif est == "registro_pass":
-        nombre = estados[uid]["nombre"]
-        db.registrar_usuario(uid, nombre, texto)
-        u = db.get_usuario(uid)
-        if u:
-            sesiones[uid] = u["id"]
-            estados.pop(uid, None)
-            await update.message.reply_text(f"Registrado como {nombre}")
-        else:
-            await update.message.reply_text("Error al registrar. Intenta de nuevo.")
+    nombre = estados[uid]["nombre"]
+    nuevo_id = db.registrar_usuario(uid, nombre, texto)
+    if nuevo_id:
+        sesiones[uid] = nuevo_id
+        estados.pop(uid, None)
+        await update.message.reply_text(f"Registrado como {nombre}")
+    else:
+        await update.message.reply_text("Error al registrar. Intenta de nuevo.")
     elif est == "publicar_categoria":
         estados[uid]["categoria"] = texto
         estados[uid]["estado"] = "publicar_producto"
