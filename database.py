@@ -8,6 +8,9 @@ TURSO_TOKEN = os.environ.get("TURSO_TOKEN", "")
 
 def execute(sql, params=None):
     headers = {"Authorization": f"Bearer {TURSO_TOKEN}", "Content-Type": "application/json"}
+    if params:
+        for i, p in enumerate(params):
+            sql = sql.replace("?", f"${i+1}", 1)
     data = {"statements": [{"sql": sql, "args": params or []}]}
     r = requests.post(f"{TURSO_URL}/v2/pipeline", headers=headers, json=data, timeout=10)
     result = r.json()
