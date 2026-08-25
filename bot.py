@@ -70,18 +70,14 @@ async def handle_mensaje(update, context):
             estados[uid]["estado"] = "registro_pass"
             await update.message.reply_text("Elige una contrasena:")
     elif est == "registro_pass":
-    nombre = estados[uid]["nombre"]
-    nuevo_id = db.registrar_usuario(uid, nombre, texto)
-    if nuevo_id:
-        sesiones[uid] = nuevo_id
-        estados.pop(uid, None)
-        await update.message.reply_text(f"Registrado como {nombre}")
-    else:
-        await update.message.reply_text("Error al registrar. Intenta de nuevo.")
-    elif est == "publicar_categoria":
-        estados[uid]["categoria"] = texto
-        estados[uid]["estado"] = "publicar_producto"
-        await update.message.reply_text("Producto:")
+        nombre = estados[uid]["nombre"]
+        nuevo_id = db.registrar_usuario(uid, nombre, texto)
+        if nuevo_id:
+            sesiones[uid] = nuevo_id
+            estados.pop(uid, None)
+            await update.message.reply_text(f"Registrado como {nombre}")
+        else:
+            await update.message.reply_text("Error al registrar. Intenta de nuevo.")
     elif est == "publicar_producto":
         estados[uid]["producto"] = texto
         estados[uid]["estado"] = "publicar_cantidad"
@@ -141,7 +137,7 @@ async def boton(update, context):
     elif data == "ayuda":
         await ayuda(update, context)
     elif data.startswith("cat_"):
-        estados[uid] = {"estado": "publicar_categoria", "categoria": data[4:]}
+        estados[uid] = {"estado": "publicar_producto", "categoria": data[4:]}
         await q.edit_message_text("Producto:")
     elif data.startswith("ver_"):
         oferta_id = int(data[4:])
