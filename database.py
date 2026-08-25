@@ -105,7 +105,7 @@ def registrar_usuario(telegram_id, nombre, contrasena):
     if rows:
         return rows[0][0]
     return None
-    
+
 def verificar_login(nombre, contrasena, telegram_id):
     u = get_usuario_by_nombre(nombre)
     if u and u["contrasena"] == hash_password(contrasena) and u["telegram_id"] == telegram_id:
