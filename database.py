@@ -100,7 +100,12 @@ def get_usuario_by_nombre(nombre):
 def registrar_usuario(telegram_id, nombre, contrasena):
     execute("INSERT INTO usuarios (telegram_id, nombre, contrasena) VALUES (?, ?, ?)",
             [telegram_id, nombre, hash_password(contrasena)])
-
+    r = execute("SELECT id FROM usuarios WHERE telegram_id = ?", [telegram_id])
+    rows = r.get("rows", [])
+    if rows:
+        return rows[0][0]
+    return None
+    
 def verificar_login(nombre, contrasena, telegram_id):
     u = get_usuario_by_nombre(nombre)
     if u and u["contrasena"] == hash_password(contrasena) and u["telegram_id"] == telegram_id:
